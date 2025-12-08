@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TouhouClone", "TouhouClone\TouhouClone.csproj", "{AA48FFAF-8AF0-40AB-865A-63E281495612}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AA48FFAF-8AF0-40AB-865A-63E281495612}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA48FFAF-8AF0-40AB-865A-63E281495612}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA48FFAF-8AF0-40AB-865A-63E281495612}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA48FFAF-8AF0-40AB-865A-63E281495612}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
