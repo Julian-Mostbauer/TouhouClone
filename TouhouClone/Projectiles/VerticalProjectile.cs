@@ -13,4 +13,16 @@ public class VerticalProjectile(Vector2 spawnPoint, float speed, Color color, in
         base.Update(dt);
         Position += Velocity * dt;
     }
+
+    public override void Draw()
+    {
+        bool facingUp = Velocity.Y < 0;
+        int sgn = facingUp ? 1 : -1;
+        Raylib.DrawTriangle(
+            new Vector2(Position.X, Position.Y - 10 * sgn), // Top vertex
+            new Vector2(Position.X - 5 * sgn, Position.Y + 5 * sgn), // Bottom-left vertex
+            new Vector2(Position.X + 5 * sgn, Position.Y + 5 * sgn), // Bottom-right vertex
+            Color
+        );
+    }
 }

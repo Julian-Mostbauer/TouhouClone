@@ -21,7 +21,7 @@ public record BehaviorModel(
 {
     public static readonly BehaviorModel Default = new(0.02f, 0.01f, 0.02f, -100f, 100f);
     public static readonly BehaviorModel Tackler = new(0.06f, 0.08f, 0.0f, 1000f, 200f);
-    public static readonly BehaviorModel Scared = new(0.04f, 0.04f, 0.4f, -10000f, 0f);
+    public static readonly BehaviorModel Scared = new(0.04f, 0.04f, 0.01f, -10000f, 0f);
 };
 
 public record StatModel(
