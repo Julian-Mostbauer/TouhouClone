@@ -81,4 +81,19 @@ public class Enemy : Entity
         int y = (int)(Position.Y - fontSize / 2f);
         Raylib.DrawText(text, x, y, fontSize, Color.Black);
     }
+
+    public String Serialize()
+    {
+        return string.Join("|",
+            "Enemy",
+            $"pos={Position.X:F2},{Position.Y:F2}",
+            $"size={Size:F2}",
+            $"health={Health}/{MaxHealth}",
+            $"slam={SlamDamage}",
+            $"speed={_speed:F2}",
+            $"goal={_goal.X:F2},{_goal.Y:F2}",
+            $"behavior=goalChange:{Behavior.MovementGoalChange:F4},centerBias:{Behavior.CenterBias:F4},playerBias:{Behavior.PlayerBias:F4},speedChange:{Behavior.SpeedChange:F4}",
+            $"stats=baseSpeed:{Stats.BaseSpeed:F2},min:{Stats.MinSpeed:F2},max:{Stats.MaxSpeed:F2},size:{Stats.Size:F2},maxHealth:{Stats.MaxHealth},slam:{Stats.SlamDamage}"
+        );
+    }
 }

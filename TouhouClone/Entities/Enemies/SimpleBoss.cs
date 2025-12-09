@@ -16,10 +16,14 @@ public class SimpleBoss(Vector2 position, BehaviorModel behavior, StatModel stat
 
         const float radius = 100f;
         const float angularSpeed = 1f;
-        Position = Game.ScreenCenter + new Vector2(
+        var target = Game.ScreenCenter + new Vector2(
             radius * MathF.Cos(angularSpeed * _timeAlive),
             radius * MathF.Sin(angularSpeed * _timeAlive)
         ) - new Vector2(0, 150);
+
+        const float lerpSpeed = .5f;
+        var t = MathF.Min(1f, lerpSpeed * dt);
+        Position += (target - Position) * t;
     }
 
     public override void Update(float dt)

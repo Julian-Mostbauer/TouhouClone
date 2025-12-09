@@ -18,24 +18,44 @@ internal static class Game
     private static List<Entity> Enemies { get; } = new(100);
 
     public static readonly Vector2 ScreenCenter = new(ScreenWidth / 2f, ScreenHeight / 2f);
+    private static readonly Level Level = Level.LoadFromFile("level1.txt");
 
     public static void Run()
     {
         Raylib.InitWindow(ScreenWidth, ScreenHeight, "Touhou Clone - Raylib template");
         Raylib.SetTargetFPS(60);
-
-        var enemySpawn = ScreenCenter - new Vector2(0, 100);
-//        SpawnEnemy(new SimpleBoss(enemySpawn, BehaviorModel.Default, new StatModel(50, 50, 50, 100, 100, 100, 1000, 70)));
-//        SpawnEnemy(EnemyFactory.CreateTank(enemySpawn));
-        SpawnEnemy(EnemyFactory.CreateSniper(enemySpawn));
-
-        while (!Raylib.WindowShouldClose())
+        Console.WriteLine(Level.Serialize());
+        bool finished = false;
+        int gameRes = 0;
+        while (!Raylib.WindowShouldClose() && !finished)
         {
             var dt = Raylib.GetFrameTime();
 
             HandleInput(dt);
             HandleUpdate(dt);
             HandleDraw();
+
+            if (!Player.GetInstance().IsAlive) gameRes = -1;
+            if (Level.Completed && Enemies.Count == 0) gameRes = 1;
+            if (gameRes != 0 && ProjectilesEnemy.Count == 0) finished = true; // stop when all enemy projectiles are gone
+        }
+
+        switch (gameRes)
+        {
+            case 1:
+                Raylib.BeginDrawing();
+                Raylib.ClearBackground(Color.Black);
+                Raylib.DrawText("You Win!", ScreenWidth / 2 - 50, ScreenHeight / 2 - 10, 20, Color.Green);
+                Raylib.EndDrawing();
+                Raylib.WaitTime(2f);
+                break;
+            case -1:
+                Raylib.BeginDrawing();
+                Raylib.ClearBackground(Color.Black);
+                Raylib.DrawText("Game Over!", ScreenWidth / 2 - 50, ScreenHeight / 2 - 10, 20, Color.Red);
+                Raylib.EndDrawing();
+                Raylib.WaitTime(2f);
+                break;
         }
 
         Raylib.CloseWindow();
@@ -47,10 +67,9 @@ internal static class Game
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Color.Black);
 
-        // HUD
-        Raylib.DrawText(player.ToString(), 10, 10, 10, Color.Green);
-        Raylib.DrawText($"Proj. Enemy: {ProjectilesEnemy.Count}", 10, 30, 10, Color.Green);
-        Raylib.DrawText($"Proj. Friendly: {ProjectilesFriendly.Count}", 10, 50, 10, Color.Green);
+        // Projectiles
+        ProjectilesFriendly.ForEach(p => p.Draw());
+        ProjectilesEnemy.ForEach(p => p.Draw());
 
         // Player
         player.Draw();
@@ -58,9 +77,10 @@ internal static class Game
         // Enemies
         Enemies.ForEach(e => e.Draw());
 
-        // Projectiles
-        ProjectilesFriendly.ForEach(p => p.Draw());
-        ProjectilesEnemy.ForEach(p => p.Draw());
+        // HUD
+        Raylib.DrawText($"{player.Health} / {player.MaxHealth}", 10, 10, 20, Color.Green);
+        Raylib.DrawText(Level.GetCurrentWaveInfo(), 10, 30, 20, Color.Yellow);
+
 
         Raylib.EndDrawing();
     }
@@ -130,6 +150,9 @@ internal static class Game
                 enemy.ForcePush(-dir);
             }
         }
+
+        // update level
+        if (Enemies.Count == 0) Level.StartNextWave(dt);
     }
 
     public static Vector2 ClampToScreen(Vector2 position, float size)
@@ -145,7 +168,8 @@ internal static class Game
         projectileList.Add(proj);
     }
 
-    private static void SpawnEnemy(Entity enemy) => Enemies.Add(enemy);
+    public static void SpawnEnemy(Entity enemy) => Enemies.Add(enemy);
+
     public static Vector2[] PointsAroundCircle(Vector2 center, float radius, int amount)
     {
         var points = new Vector2[amount];
