@@ -10,11 +10,13 @@ public class TracingProjectile(
     float speed,
     Color color,
     int damage,
-    Entity target) : Projectile(firedByPlayer, position, 2, speed, color, damage)
+    Entity target,
+    float lifeTime,
+    int childCount = 8) : Projectile(firedByPlayer, position, 2, speed, color, damage)
 {
-    private float LifeTime { get; set; } = 5f;
+    private float LifeTime { get; set; } = lifeTime;
     protected Entity? Target = target;
-    
+
     public override void Update(float dt)
     {
         LifeTime -= dt;
@@ -32,11 +34,11 @@ public class TracingProjectile(
 
     protected void Explode()
     {
-        const int amount = 8;
+        int amount = childCount;
         for (int i = 0; i < amount; i++)
         {
             // spawn in a circle around the current position
-            var angle =  2 * MathF.PI * ((float)i / amount);
+            var angle = 2 * MathF.PI * ((float)i / amount);
             var pos = Position + new Vector2(MathF.Cos(angle), MathF.Sin(angle));
             Game.SpawnProjectile(new TargetedProjectile(FiredByPlayer, Position, pos, Speed * 2f, Color, Damage / 4));
         }

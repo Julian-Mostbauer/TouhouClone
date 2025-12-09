@@ -4,8 +4,8 @@ using TouhouClone.Entities;
 
 namespace TouhouClone.Projectiles;
 
-public class MultiTracingProjectile(bool firedByPlayer, Vector2 position, float speed, Color color, int damage, IEnumerable<Entity> targets)
-    : TracingProjectile(firedByPlayer, position, speed, color, damage, targets.First())
+public class MultiTracingProjectile(bool firedByPlayer, Vector2 position, float speed, Color color, int damage, IEnumerable<Entity> targets, float lifeTime, int childCount = 8)
+    : TracingProjectile(firedByPlayer, position, speed, color, damage, targets.First(), lifeTime, childCount)
 {
     public override void Update(float dt)
     {

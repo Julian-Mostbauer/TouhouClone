@@ -10,12 +10,12 @@ internal static class Game
 {
     public static readonly Random Random = new();
     public const int ScreenWidth = 800;
-    public const int ScreenHeight = 600;
-    private static readonly List<Projectile> ProjectilesFriendly = new(50);
-    private static readonly List<Projectile> ProjectilesEnemy = new(100);
-    private static readonly List<Projectile> ProjectilesFriendlyQueue = new(50);
-    private static readonly List<Projectile> ProjectilesEnemyQueue = new(100);
-    public static List<Entity> Enemies { get; }= new(100);
+    public const int ScreenHeight = 800;
+    private static List<Projectile> ProjectilesFriendly { get; } = new(50);
+    private static List<Projectile> ProjectilesEnemy { get; } = new(100);
+    private static List<Projectile> ProjectilesFriendlyQueue { get; } = new(50);
+    private static List<Projectile> ProjectilesEnemyQueue { get; } = new(100);
+    private static List<Entity> Enemies { get; } = new(100);
 
     public static readonly Vector2 ScreenCenter = new(ScreenWidth / 2f, ScreenHeight / 2f);
 
@@ -25,8 +25,8 @@ internal static class Game
         Raylib.SetTargetFPS(60);
 
         var enemySpawn = ScreenCenter - new Vector2(0, 100);
-        SpawnEnemy(EnemyFactory.CreateSimple(enemySpawn));
-        SpawnEnemy(EnemyFactory.CreateTank(enemySpawn));
+//        SpawnEnemy(new SimpleBoss(enemySpawn, BehaviorModel.Default, new StatModel(50, 50, 50, 100, 100, 100, 1000, 70)));
+//        SpawnEnemy(EnemyFactory.CreateTank(enemySpawn));
         SpawnEnemy(EnemyFactory.CreateSniper(enemySpawn));
 
         while (!Raylib.WindowShouldClose())
@@ -51,7 +51,7 @@ internal static class Game
         Raylib.DrawText(player.ToString(), 10, 10, 10, Color.Green);
         Raylib.DrawText($"Proj. Enemy: {ProjectilesEnemy.Count}", 10, 30, 10, Color.Green);
         Raylib.DrawText($"Proj. Friendly: {ProjectilesFriendly.Count}", 10, 50, 10, Color.Green);
-        
+
         // Player
         player.Draw();
 
@@ -94,7 +94,7 @@ internal static class Game
         ProjectilesEnemyQueue.Clear();
         ProjectilesFriendly.AddRange(ProjectilesFriendlyQueue);
         ProjectilesFriendlyQueue.Clear();
-        
+
         // update all projectiles
         ProjectilesEnemy.ForEach(p => p.Update(dt));
         ProjectilesFriendly.ForEach(p => p.Update(dt));
@@ -102,14 +102,14 @@ internal static class Game
         // update player
         var player = Player.GetInstance();
         player.Update(dt);
-        
+
         // collisions with enemy projectiles
         foreach (var proj in ProjectilesEnemy.Where(proj => proj.IsColliding(player)))
         {
             player.TakeDamage(5);
             proj.MarkForRemoval();
         }
-        
+
         // update enemies
         foreach (var enemy in Enemies)
         {
@@ -130,8 +130,6 @@ internal static class Game
                 enemy.ForcePush(-dir);
             }
         }
-
-        
     }
 
     public static Vector2 ClampToScreen(Vector2 position, float size)
@@ -148,4 +146,15 @@ internal static class Game
     }
 
     private static void SpawnEnemy(Entity enemy) => Enemies.Add(enemy);
+    public static Vector2[] PointsAroundCircle(Vector2 center, float radius, int amount)
+    {
+        var points = new Vector2[amount];
+        for (int i = 0; i < amount; i++)
+        {
+            var angle = 2 * MathF.PI * ((float)i / amount);
+            points[i] = center + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * radius;
+        }
+
+        return points;
+    }
 }
