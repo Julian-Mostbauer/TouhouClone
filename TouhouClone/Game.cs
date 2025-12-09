@@ -1,6 +1,7 @@
 using System.Numerics;
 using Raylib_cs;
 using TouhouClone.Entities;
+using TouhouClone.Entities.Enemies;
 using TouhouClone.Projectiles;
 
 namespace TouhouClone;
@@ -21,9 +22,10 @@ internal static class Game
         Raylib.InitWindow(ScreenWidth, ScreenHeight, "Touhou Clone - Raylib template");
         Raylib.SetTargetFPS(60);
 
-        SpawnEnemy(new Vector2(ScreenWidth / 2f, 100f), BehaviorModel.Default);
-        SpawnEnemy(new Vector2(ScreenWidth / 2f, 100f), BehaviorModel.Default);
-        SpawnEnemy(new Vector2(ScreenWidth / 2f, 100f), BehaviorModel.Default);
+        var enemySpawn = ScreenCenter - new Vector2(0, 100);
+        SpawnEnemy(EnemyFactory.CreateTank(enemySpawn));
+        SpawnEnemy(EnemyFactory.CreateTank(enemySpawn));
+        SpawnEnemy(EnemyFactory.CreateSniper(enemySpawn));
 
         while (!Raylib.WindowShouldClose())
         {
@@ -44,9 +46,10 @@ internal static class Game
         Raylib.ClearBackground(Color.Black);
 
         // HUD
-        Raylib.DrawText($"{player.Health} / {player.MaxHealth}", 10, 10, 20, Color.Green);
-        Raylib.DrawFPS(10, 40);
-        Raylib.DrawText(player.ToString(), 10, 60, 10, Color.Green);
+        Raylib.DrawText(player.ToString(), 10, 10, 10, Color.Green);
+        Raylib.DrawText($"Proj. Enemy: {ProjectilesEnemy.Count}", 10, 30, 10, Color.Green);
+        Raylib.DrawText($"Proj. Friendly: {ProjectilesFriendly.Count}", 10, 50, 10, Color.Green);
+        
         // Player
         player.Draw();
 
@@ -128,9 +131,5 @@ internal static class Game
         projectileList.Add(proj);
     }
 
-    private static void SpawnEnemy(Vector2 position, BehaviorModel behaviorModel)
-    {
-        Enemies.Add(
-            new SimpleEntity(position, behaviorModel, new StatModel(200f, 300f, 100f, 200f, 5, 10, 200, 20)));
-    }
+    private static void SpawnEnemy(Entity enemy) => Enemies.Add(enemy);
 }

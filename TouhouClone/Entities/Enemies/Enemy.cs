@@ -1,17 +1,27 @@
 using System.Numerics;
-using Raylib_cs;
-using TouhouClone.Projectiles;
 
 namespace TouhouClone.Entities;
 
-public class SimpleEntity(Vector2 position, BehaviorModel behavior, StatModel stats)
-    : Entity(position, stats.Size, stats.MaxHealth, stats.MaxHealth, stats.SlamDamage)
+using System.Numerics;
+using Raylib_cs;
+using TouhouClone.Projectiles;
+
+public class Enemy : Entity
 {
-    private float _speed = stats.BaseSpeed;
-    private static readonly Color[] Colors = [Color.Yellow, Color.Orange, Color.Red];
-    private Color Color => Colors[CalculateColorIndex(Health, MaxHealth)];
-    private Vector2 _goal = new(0, 0);
-    private readonly Random _random = Game.Random;
+    protected float _speed = 0;
+    protected static readonly Color[] Colors = [Color.Yellow, Color.Orange, Color.Red];
+    protected Color Color => Colors[CalculateColorIndex(Health, MaxHealth)];
+    protected Vector2 _goal = new(0, 0);
+    protected readonly Random _random = Game.Random;
+    protected readonly BehaviorModel Behavior;
+    protected readonly StatModel Stats;
+
+    protected Enemy(Vector2 position, BehaviorModel behavior, StatModel stats) : base(position, stats.Size, stats.MaxHealth, stats.MaxHealth, stats.SlamDamage)
+    {
+        _speed = stats.BaseSpeed;
+        Behavior = behavior;
+        Stats = stats;
+    }
 
     private static int CalculateColorIndex(int health, int maxHealth)
     {
@@ -31,36 +41,27 @@ public class SimpleEntity(Vector2 position, BehaviorModel behavior, StatModel st
         base.Update(dt);
 
         Movement(dt);
-        Shooting();
         Position = Game.ClampToScreen(Position, Size);
     }
-
-    private void Shooting()
-    {
-        if (!(_random.NextDouble() < behavior.ShootChance)) return;
-        Game.SpawnProjectile(
-            new TargetedProjectile(Position, Player.GetInstance().Position, stats.ProjectileSpeed, Color.Red,
-                stats.ProjectileDamage), false);
-    }
-
-    private void Movement(float dt)
+    
+    protected virtual void Movement(float dt)
     {
         // Choose a new random goal occasionally
-        if (_goal.Length() == 0 || _random.NextDouble() < behavior.TargetChange)
+        if (_goal.Length() == 0 || _random.NextDouble() < Behavior.MovementGoalChange)
         {
             float x = (float)(_random.NextDouble() * Game.ScreenWidth);
             float y = (float)(_random.NextDouble() * Game.ScreenHeight);
             var point = new Vector2(x, y);
             var toCenter = Vector2.Normalize(Game.ScreenCenter - point);
             var toPlayer = Vector2.Normalize(Player.GetInstance().Position - point);
-            var bias = toCenter * behavior.CenterBias + toPlayer * behavior.PlayerBias;
+            var bias = toCenter * Behavior.CenterBias + toPlayer * Behavior.PlayerBias;
             _goal = point + bias;
         }
 
         // adjust speed based on randomness and health (less health = faster)
-        if (_random.NextDouble() < behavior.SpeedChange)
+        if (_random.NextDouble() < Behavior.SpeedChange)
             _speed += (float)(_random.NextDouble() - ((float)Health / MaxHealth)) * 20f;
-        _speed = Math.Clamp(_speed, stats.MinSpeed, stats.MaxSpeed);
+        _speed = Math.Clamp(_speed, Stats.MinSpeed, Stats.MaxSpeed);
 
         // calculate velocity towards goal
         var dir = _goal - Position;

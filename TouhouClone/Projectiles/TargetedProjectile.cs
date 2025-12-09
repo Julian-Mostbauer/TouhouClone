@@ -11,14 +11,7 @@ public class TargetedProjectile(Vector2 spawnPoint, Vector2 targetPoint, float s
 
     public override void Update(float dt)
     {
-        if (!fullyOnScreen())
-        {
-            MarkForRemoval();
-            return;
-        }
-
+        base.Update(dt);
         Position += Velocity * dt;
     }
-
-    public override void Draw() => Raylib.DrawCircleV(Position, Size, Color);
 }

@@ -4,8 +4,8 @@ namespace TouhouClone;
 
 public abstract class GameObj(Vector2 position, float size)
 {
-    public Vector2 Position = position;
-    public float Size = size;
+    public Vector2 Position { get; protected set; } = position;
+    protected readonly float Size = size;
     private Vector2 _forceVelocity = Vector2.Zero;
     public bool IsActive { get; private set; } = true;
 

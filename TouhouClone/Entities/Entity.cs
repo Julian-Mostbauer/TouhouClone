@@ -13,7 +13,7 @@ public abstract class Entity(Vector2 position, float size, int maxHealth, int he
 }
 
 public record BehaviorModel(
-    float TargetChange,
+    float MovementGoalChange,
     float SpeedChange,
     float ShootChance,
     float PlayerBias,
@@ -21,6 +21,7 @@ public record BehaviorModel(
 {
     public static readonly BehaviorModel Default = new(0.02f, 0.01f, 0.02f, -100f, 100f);
     public static readonly BehaviorModel Tackler = new(0.02f, 0.01f, 0.0f, 500f, 100f);
+    public static readonly BehaviorModel Scared = new(0.4f, 0.4f, 0.4f, -10000f, 0f);
 };
 
 public record StatModel(

@@ -10,14 +10,7 @@ public class VerticalProjectile(Vector2 spawnPoint, float speed, Color color, in
 
     public override void Update(float dt)
     {
-        if (!fullyOnScreen())
-        {
-            MarkForRemoval();
-            return;
-        }
-
+        base.Update(dt);
         Position += Velocity * dt;
     }
-
-    public override void Draw() => Raylib.DrawCircleV(Position, Size, Color);
 }
