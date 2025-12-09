@@ -1,6 +1,7 @@
 using System.Numerics;
 using Raylib_cs;
 using TouhouClone.Entities;
+using TouhouClone.Projectiles;
 
 namespace TouhouClone;
 
@@ -43,7 +44,7 @@ internal static class Game
         Raylib.ClearBackground(Color.Black);
 
         // HUD
-        Raylib.DrawText($"{player.GetHealth} / {player.GetMaxHealth}", 10, 10, 20, Color.Green);
+        Raylib.DrawText($"{player.Health} / {player.MaxHealth}", 10, 10, 20, Color.Green);
         Raylib.DrawFPS(10, 40);
         Raylib.DrawText(player.ToString(), 10, 60, 10, Color.Green);
         // Player
@@ -121,18 +122,9 @@ internal static class Game
         return position;
     }
 
-    public static void SpawnProjectile(Vector2 position, int projectileDamage, Vector2 velocity,
-        bool firedByPlayer)
+    public static void SpawnProjectile(Projectile proj, bool firedByPlayer)
     {
         var projectileList = firedByPlayer ? ProjectilesFriendly : ProjectilesEnemy;
-        var proj = new Projectile
-        {
-            Position = position,
-            Velocity = velocity,
-            Size = 5f,
-            Damage = projectileDamage,
-            Color = firedByPlayer ? Color.Green : Color.Red
-        };
         projectileList.Add(proj);
     }
 

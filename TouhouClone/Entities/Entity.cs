@@ -1,13 +1,13 @@
+using System.Numerics;
+
 namespace TouhouClone.Entities;
 
-public abstract class Entity : GameObj
+public abstract class Entity(Vector2 position, float size, int maxHealth, int health, int slamDamage) : GameObj(position, size)
 {
-    protected int Health;
-    protected int MaxHealth;
-    public int GetHealth => Health;
-    public int GetMaxHealth => MaxHealth;
+    public int Health { get; private set; }= health;
+    public int MaxHealth { get; private set; } = maxHealth;
     public bool IsAlive => Health > 0;
-    public int SlamDamage;
+    public int SlamDamage { get; private set; } = slamDamage;
 
     public virtual void TakeDamage(int amount) => Health -= amount;
 }

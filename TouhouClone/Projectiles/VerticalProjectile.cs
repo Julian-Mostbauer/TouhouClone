@@ -1,13 +1,12 @@
 using System.Numerics;
 using Raylib_cs;
 
-namespace TouhouClone;
+namespace TouhouClone.Projectiles;
 
-public class Projectile : GameObj
+public class VerticalProjectile(Vector2 spawnPoint, float speed, Color color, int damage)
+    : Projectile(spawnPoint, 5, speed, color, damage)
 {
-    public Vector2 Velocity { get; init; }
-    public Color Color { get; init; }
-    public int Damage { get; init; }
+    private Vector2 Velocity { get; init; } = new(0, speed);
 
     public override void Update(float dt)
     {

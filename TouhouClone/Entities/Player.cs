@@ -1,11 +1,12 @@
 using System.Numerics;
 using Raylib_cs;
+using TouhouClone.Projectiles;
 
 namespace TouhouClone.Entities;
 
 public class Player : Entity
 {
-    public Vector2 Velocity;
+    public Vector2 Velocity { get; set; }
     private static Player? _instance;
     public readonly float Speed;
     private readonly float _shootCooldown = 0.2f;
@@ -16,14 +17,10 @@ public class Player : Entity
 
     public static Player GetInstance() => _instance ??= new Player();
 
-    private Player()
+    private Player() : base(Game.ScreenCenter, 12, 100, 100, 0)
     {
-        Size = 12;
         Speed = 2500f;
-        MaxHealth = 100;
         Velocity = Vector2.Zero;
-        Position = Game.ScreenCenter;
-        Health = MaxHealth;
     }
 
     public override void Update(float dt)
@@ -59,7 +56,7 @@ public class Player : Entity
     public void Shoot()
     {
         if (_remainingShootCooldown > 0) return;
-        Game.SpawnProjectile(Position, 10, new Vector2(0, -500f), true);
+        Game.SpawnProjectile(new VerticalProjectile(Position, -500, Color.Green, 10), true);
         _remainingShootCooldown = _shootCooldown;
     }
 
