@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using Raylib_cs;
 
 namespace TouhouClone
@@ -20,6 +19,8 @@ namespace TouhouClone
             Raylib.InitWindow(ScreenWidth, ScreenHeight, "Touhou Clone - Raylib template");
             Raylib.SetTargetFPS(60);
 
+            SpawnEnemy(new Vector2(ScreenWidth / 2f, 100f), BehaviorModel.Default);
+            SpawnEnemy(new Vector2(ScreenWidth / 2f, 100f), BehaviorModel.Default);
             SpawnEnemy(new Vector2(ScreenWidth / 2f, 100f), BehaviorModel.Default);
 
             while (!Raylib.WindowShouldClose())
@@ -92,19 +93,19 @@ namespace TouhouClone
             {
                 foreach (var proj in ProjectilesFriendly.Where(proj => enemy.IsColliding(proj)))
                 {
-                    enemy.TakeDamage(10);
+                    enemy.TakeDamage(proj.Damage);
                     proj.MarkForRemoval();
                 }
 
                 if (enemy.IsColliding(Player.GetInstance()))
                 {
-                    player.TakeDamage(10);
+                    player.TakeDamage(enemy.SlamDamage);
                     var dir = Vector2.Normalize(Player.GetInstance().Position - enemy.Position) * 20f;
                     player.ForcePush(dir);
                     enemy.ForcePush(-dir);
                 }
             }
-            
+
             foreach (var proj in ProjectilesEnemy.Where(proj => proj.IsColliding(player)))
             {
                 player.TakeDamage(5);
@@ -119,7 +120,8 @@ namespace TouhouClone
             return position;
         }
 
-        private static void SpawnProjectile(Vector2 position, Vector2 velocity, bool firedByPlayer)
+        private static void SpawnProjectile(Vector2 position, int projectileDamage, Vector2 velocity,
+            bool firedByPlayer)
         {
             var projectileList = firedByPlayer ? ProjectilesFriendly : ProjectilesEnemy;
             var proj = new Projectile
@@ -127,6 +129,7 @@ namespace TouhouClone
                 Position = position,
                 Velocity = velocity,
                 Size = 5f,
+                Damage = projectileDamage,
                 Color = firedByPlayer ? Color.Green : Color.Red
             };
             projectileList.Add(proj);
@@ -134,7 +137,8 @@ namespace TouhouClone
 
         private static void SpawnEnemy(Vector2 position, BehaviorModel behaviorModel)
         {
-            Enemies.Add(new SimpleEntity(position, behaviorModel));
+            Enemies.Add(
+                new SimpleEntity(position, behaviorModel, new StatModel(200f, 300f, 100f, 200f, 5, 10, 200, 20)));
         }
 
         internal abstract class GameObj
@@ -174,8 +178,9 @@ namespace TouhouClone
 
         private class Projectile : GameObj
         {
-            public Vector2 Velocity;
-            public Color Color;
+            public Vector2 Velocity { get; init; }
+            public Color Color { get; init; }
+            public int Damage { get; init; }
 
             public override void Update(float dt)
             {
@@ -188,10 +193,7 @@ namespace TouhouClone
                 Position += Velocity * dt;
             }
 
-            public override void Draw()
-            {
-                Raylib.DrawCircleV(Position, Size, Color);
-            }
+            public override void Draw() => Raylib.DrawCircleV(Position, Size, Color);
         }
 
         private abstract class Entity : GameObj
@@ -201,6 +203,7 @@ namespace TouhouClone
             public int GetHealth => Health;
             public int GetMaxHealth => MaxHealth;
             public bool IsAlive => Health > 0;
+            public int SlamDamage;
 
             public virtual void TakeDamage(int amount) => Health -= amount;
         }
@@ -216,21 +219,35 @@ namespace TouhouClone
             public static readonly BehaviorModel Tackler = new(0.02f, 0.01f, 0.0f, 500f, 100f);
         };
 
+        private record StatModel(
+            float BaseSpeed,
+            float MaxSpeed,
+            float MinSpeed,
+            float ProjectileSpeed,
+            int ProjectileDamage,
+            int SlamDamage,
+            int MaxHealth,
+            int Size);
+
         private class SimpleEntity : Entity
         {
-            private float _speed = 100f;
-            private Vector2 _goal = new(0, 0);
+            private float _speed;
+            private readonly BehaviorModel _behavior;
+            private readonly StatModel _stats;
             private static readonly Color[] Colors = [Color.Yellow, Color.Orange, Color.Red];
             private Color Color => Colors[CalculateColorIndex(Health, MaxHealth)];
-            private readonly BehaviorModel _model;
+            private Vector2 _goal = new(0, 0);
 
-            public SimpleEntity(Vector2 position, BehaviorModel model)
+            public SimpleEntity(Vector2 position, BehaviorModel behavior, StatModel stats)
             {
                 Position = position;
-                _model = model;
-                Size = 20f;
-                MaxHealth = 250;
-                Health = 250;
+                _behavior = behavior;
+                Size = stats.Size;
+                _speed = stats.BaseSpeed;
+                MaxHealth = stats.MaxHealth;
+                Health = stats.MaxHealth;
+                SlamDamage = stats.SlamDamage;
+                _stats = stats;
             }
 
             private static int CalculateColorIndex(int health, int maxHealth)
@@ -257,16 +274,16 @@ namespace TouhouClone
 
             private void Shooting()
             {
-                if (!(Random.NextDouble() < _model.ShootChance)) return;
+                if (!(Random.NextDouble() < _behavior.ShootChance)) return;
                 var directionToPlayer =
                     Vector2.Normalize(Player.GetInstance().Position - Position);
-                SpawnProjectile(Position, directionToPlayer * 200f, false);
+                SpawnProjectile(Position, _stats.ProjectileDamage, directionToPlayer * _stats.ProjectileSpeed, false);
             }
 
             private void Movement(float dt)
             {
                 // Choose a new random goal occasionally
-                if (_goal.Length() == 0 || Random.NextDouble() < _model.TargetChange)
+                if (_goal.Length() == 0 || Random.NextDouble() < _behavior.TargetChange)
                 {
                     float x = (float)(Random.NextDouble() * ScreenWidth);
                     float y = (float)(Random.NextDouble() * ScreenHeight);
@@ -274,26 +291,33 @@ namespace TouhouClone
                     var center = new Vector2(ScreenWidth / 2f, ScreenHeight / 2f);
                     var toCenter = Vector2.Normalize(center - point);
                     var toPlayer = Vector2.Normalize(Player.GetInstance().Position - point);
-                    // bias away from player, towards center
-                    var bias = toCenter * _model.CenterBias + toPlayer * _model.PlayerBias;
+                    var bias = toCenter * _behavior.CenterBias + toPlayer * _behavior.PlayerBias;
                     _goal = point + bias;
                 }
 
                 // adjust speed based on randomness and health (less health = faster)
-                if (Random.NextDouble() < _model.SpeedChange)
+                if (Random.NextDouble() < _behavior.SpeedChange)
                     _speed += (float)(Random.NextDouble() - ((float)Health / MaxHealth)) * 20f;
-                _speed = Math.Clamp(_speed, 50f, 200f);
+                _speed = Math.Clamp(_speed, _stats.MinSpeed, _stats.MaxSpeed);
 
                 // calculate velocity towards goal
-                var directionToGoal = Vector2.Normalize(_goal - Position);
+                var dir = _goal - Position;
+                var directionToGoal = dir.Length() > 0 ? Vector2.Normalize(dir) : dir;
 
                 var vel = directionToGoal * _speed;
-                // Move and bounce off-screen edges
                 Position += vel * dt;
-                if (!fullyOnScreen()) vel = -vel;
             }
 
-            public override void Draw() => Raylib.DrawCircleV(Position, Size, Color);
+            public override void Draw()
+            {
+                Raylib.DrawCircleV(Position, Size, Color);
+                var text = Health.ToString();
+                int fontSize = 14;
+                int textWidth = Raylib.MeasureText(text, fontSize);
+                int x = (int)(Position.X - textWidth / 2f);
+                int y = (int)(Position.Y - fontSize / 2f);
+                Raylib.DrawText(text, x, y, fontSize, Color.Black);
+            }
         }
 
         private class Player : Entity
@@ -302,16 +326,16 @@ namespace TouhouClone
             private static Player? _instance;
             public readonly float Speed;
             private readonly float _shootCooldown = 0.2f;
-            private float _remainingShootCooldown = 0f;
+            private float _remainingShootCooldown;
             private const float InvulnerabilityTime = .1f;
-            private float _remainingInvulnerability = 0f;
-            
+            private float _remainingInvulnerability;
+
 
             public static Player GetInstance() => _instance ??= new Player();
 
             private Player()
             {
-                Size = 24f;
+                Size = 12;
                 Speed = 2500f;
                 MaxHealth = 100;
                 Velocity = Vector2.Zero;
@@ -334,16 +358,14 @@ namespace TouhouClone
 
             public override void Draw()
             {
-                Raylib.DrawCircleV(Position, Size, Color.Blue);
-                Raylib.DrawCircleV(Position, Size / 2, Color.White);
-            }
-            
-            private void MakeInvulnerable()
-            {
-                _remainingInvulnerability = InvulnerabilityTime;
+                Raylib.DrawCircleV(Position, Size * 2, Color.Blue);
+                Raylib.DrawCircleV(Position, Size, Color.White);
             }
 
+            private void MakeInvulnerable() => _remainingInvulnerability = InvulnerabilityTime;
+
             private bool IsInvulnerable() => _remainingInvulnerability > 0;
+
             public override void TakeDamage(int amount)
             {
                 if (IsInvulnerable()) return;
@@ -354,7 +376,7 @@ namespace TouhouClone
             public void Shoot()
             {
                 if (_remainingShootCooldown > 0) return;
-                SpawnProjectile(Position, new Vector2(0, -500f), true);
+                SpawnProjectile(Position, 10, new Vector2(0, -500f), true);
                 _remainingShootCooldown = _shootCooldown;
             }
 
