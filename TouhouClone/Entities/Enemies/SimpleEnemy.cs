@@ -17,7 +17,7 @@ public class SimpleEnemy(Vector2 position, BehaviorModel behavior, StatModel sta
     {
         if (!(_random.NextDouble() < Behavior.ShootChance)) return;
         Game.SpawnProjectile(
-            new TargetedProjectile(Position, Player.GetInstance().Position, Stats.ProjectileSpeed, Color.Red,
-                Stats.ProjectileDamage), false);
+            new TargetedProjectile(false, Position, Player.GetInstance().Position, Stats.ProjectileSpeed, Color.Red,
+                Stats.ProjectileDamage));
     }
 }

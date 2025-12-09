@@ -15,7 +15,7 @@ internal static class Game
     private static readonly List<Projectile> ProjectilesEnemy = new(100);
     private static readonly List<Projectile> ProjectilesFriendlyQueue = new(50);
     private static readonly List<Projectile> ProjectilesEnemyQueue = new(100);
-    private static readonly List<Entity> Enemies = new(100);
+    public static List<Entity> Enemies { get; }= new(100);
 
     public static readonly Vector2 ScreenCenter = new(ScreenWidth / 2f, ScreenHeight / 2f);
 
@@ -25,8 +25,8 @@ internal static class Game
         Raylib.SetTargetFPS(60);
 
         var enemySpawn = ScreenCenter - new Vector2(0, 100);
-        //SpawnEnemy(EnemyFactory.CreateSimple(enemySpawn));
-        //SpawnEnemy(EnemyFactory.CreateTank(enemySpawn));
+        SpawnEnemy(EnemyFactory.CreateSimple(enemySpawn));
+        SpawnEnemy(EnemyFactory.CreateTank(enemySpawn));
         SpawnEnemy(EnemyFactory.CreateSniper(enemySpawn));
 
         while (!Raylib.WindowShouldClose())
@@ -141,9 +141,9 @@ internal static class Game
         return position;
     }
 
-    public static void SpawnProjectile(Projectile proj, bool firedByPlayer)
+    public static void SpawnProjectile(Projectile proj)
     {
-        var projectileList = firedByPlayer ? ProjectilesFriendlyQueue : ProjectilesEnemyQueue;
+        var projectileList = proj.FiredByPlayer ? ProjectilesFriendlyQueue : ProjectilesEnemyQueue;
         projectileList.Add(proj);
     }
 

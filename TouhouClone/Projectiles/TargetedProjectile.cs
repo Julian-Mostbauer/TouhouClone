@@ -4,8 +4,8 @@ using TouhouClone.Entities;
 
 namespace TouhouClone.Projectiles;
 
-public class TargetedProjectile(Vector2 spawnPoint, Vector2 targetPoint, float speed, Color color, int damage)
-    : Projectile(spawnPoint, 5, speed, color, damage)
+public class TargetedProjectile(bool firedByPlayer, Vector2 spawnPoint, Vector2 targetPoint, float speed, Color color, int damage)
+    : Projectile(firedByPlayer, spawnPoint, 5, speed, color, damage)
 {
     private Vector2 Velocity { get; init; } = Vector2.Normalize(targetPoint - spawnPoint) * speed;
 

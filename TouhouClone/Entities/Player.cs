@@ -56,7 +56,7 @@ public class Player : Entity
     public void Shoot()
     {
         if (_remainingShootCooldown > 0) return;
-        Game.SpawnProjectile(new VerticalProjectile(Position, -500, Color.Green, 10), true);
+        Game.SpawnProjectile(new VerticalProjectile(true, Position, -500, Color.Green, 10));
         _remainingShootCooldown = _shootCooldown;
     }
 
