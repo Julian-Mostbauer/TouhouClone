@@ -23,13 +23,13 @@ internal static class Game
         Raylib.SetTargetFPS(60);
 
         var enemySpawn = ScreenCenter - new Vector2(0, 100);
-        SpawnEnemy(EnemyFactory.CreateTank(enemySpawn));
+        SpawnEnemy(EnemyFactory.CreateSimple(enemySpawn));
         SpawnEnemy(EnemyFactory.CreateTank(enemySpawn));
         SpawnEnemy(EnemyFactory.CreateSniper(enemySpawn));
 
         while (!Raylib.WindowShouldClose())
         {
-            float dt = Raylib.GetFrameTime();
+            var dt = Raylib.GetFrameTime();
 
             HandleInput(dt);
             HandleUpdate(dt);
