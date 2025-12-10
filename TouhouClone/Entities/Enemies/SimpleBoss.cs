@@ -28,6 +28,7 @@ public class SimpleBoss(Vector2 position, BehaviorModel behavior, StatModel stat
 
     public override void Update(float dt)
     {
+        if (!IsAlive) Explosion();
         base.Update(dt);
         _remainingShootTime -= dt;
         Shooting();
@@ -44,5 +45,14 @@ public class SimpleBoss(Vector2 position, BehaviorModel behavior, StatModel stat
 
         _remainingShootTime = ShootInterval;
         _shootCount++;
+    }
+
+    private void Explosion()
+    {
+        foreach (var point in Game.PointsAroundCircle(Position, Size, 32))
+        {
+            Game.SpawnProjectile(new TracingProjectile(false, point, Stats.ProjectileSpeed, Color,
+                Stats.ProjectileDamage, Player.GetInstance(), (float)Game.Random.NextDouble()*3, 14) );
+        }
     }
 }

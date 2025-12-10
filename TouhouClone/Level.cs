@@ -19,14 +19,16 @@ public class Level
         // TODO
         Wave[] waves =
         [
-            new([
-                EnemyFactory.CreateSimple(new Vector2(100, -100)),
-                EnemyFactory.CreateSniper(new Vector2(700, -100))
-            ]),
-            new([
-                EnemyFactory.CreateTank(new Vector2(400, -100)),
-                EnemyFactory.CreateSniper(new Vector2(400, -100))
-            ]),
+            /*
+             new([
+                   EnemyFactory.CreateSimple(new Vector2(100, -100)),
+                   EnemyFactory.CreateSniper(new Vector2(700, -100))
+               ]),
+               new([
+                   EnemyFactory.CreateTank(new Vector2(400, -100)),
+                   EnemyFactory.CreateSniper(new Vector2(400, -100))
+               ]),
+             */
             new Wave([
                 EnemyFactory.CreateSimpleBoss(new Vector2(400, -100))
             ])
