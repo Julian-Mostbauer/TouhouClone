@@ -47,11 +47,14 @@ public class TracingProjectile(
     public override void Draw()
     {
         if (Target == null) return;
-        Raylib.DrawCircleV(Position, Size, Color);
+        const float blinkPeriod = 0.125f;
+        var color = (LifeTime <= 1f && (LifeTime % (blinkPeriod * 2f)) < blinkPeriod) ? Color.White : Color;
+
+        Raylib.DrawCircleV(Position, Size, color);
         var offTowards = Vector2.Normalize(Target.Position - Position) * Size * 2;
-        Raylib.DrawLineV(Position - offTowards, Position + offTowards, Color);
+        Raylib.DrawLineV(Position - offTowards, Position + offTowards, color);
         var offNormal =
             Vector2.Normalize(new Vector2(-(Target.Position - Position).Y, (Target.Position - Position).X)) * Size * 2;
-        Raylib.DrawLineV(Position - offNormal, Position + offNormal, Color);
+        Raylib.DrawLineV(Position - offNormal, Position + offNormal, color);
     }
 }
