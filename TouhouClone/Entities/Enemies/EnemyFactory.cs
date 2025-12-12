@@ -14,5 +14,5 @@ public static class EnemyFactory
         new StatModel(200f, 300f, 100f, 200f, 5, 5, 100, 30));
 
     public static Enemy CreateSimpleBoss(Vector2 enemySpawn) => new SimpleBoss(enemySpawn, BehaviorModel.Default,
-        new StatModel(50, 50, 50, 100, 100, 100, 1000, 70));
+        new StatModel(50, 50, 50, 100, 10, 100, 1000, 70));
 }

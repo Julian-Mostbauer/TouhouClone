@@ -98,6 +98,8 @@ internal static class Game
 
     private static void HandleUpdate(float dt)
     {
+        const float pushForce = 20f;
+        
         // remove old
         ProjectilesEnemy.RemoveAll(p => !p.IsActive);
         ProjectilesFriendly.RemoveAll(p => !p.IsActive);
@@ -117,10 +119,10 @@ internal static class Game
         var player = Player.GetInstance();
         player.Update(dt);
 
-        // collisions with enemy projectiles
+        // collisions player with enemy projectiles
         foreach (var proj in ProjectilesEnemy.Where(proj => proj.IsColliding(player)))
         {
-            player.TakeDamage(5);
+            player.TakeDamage(proj.Damage);
             proj.MarkForRemoval();
         }
 
@@ -136,10 +138,10 @@ internal static class Game
             }
 
             // collisions with player
-            if (enemy.IsColliding(Player.GetInstance()))
+            if (enemy.IsColliding(player))
             {
                 player.TakeDamage(enemy.SlamDamage);
-                var dir = Vector2.Normalize(Player.GetInstance().Position - enemy.Position) * 20f;
+                var dir = Vector2.Normalize(player.Position - enemy.Position) * pushForce;
                 player.ForcePush(dir);
                 enemy.ForcePush(-dir);
             }

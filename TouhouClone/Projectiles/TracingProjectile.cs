@@ -40,7 +40,7 @@ public class TracingProjectile(
             // spawn in a circle around the current position
             var angle = 2 * MathF.PI * ((float)i / amount);
             var pos = Position + new Vector2(MathF.Cos(angle), MathF.Sin(angle));
-            Game.SpawnProjectile(new TargetedProjectile(FiredByPlayer, Position, pos, Speed * 2f, Color, Damage / 4));
+            Game.SpawnProjectile(new TargetedProjectile(FiredByPlayer, Position, pos, Speed * 2f, Color, Damage / 2));
         }
     }
 
