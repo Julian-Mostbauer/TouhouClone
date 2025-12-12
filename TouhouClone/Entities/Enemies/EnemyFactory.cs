@@ -8,7 +8,7 @@ public static class EnemyFactory
         new StatModel(250f, 500f, 200f, 100f, 10, 0, 50, 20));
 
     public static Enemy CreateTank(Vector2 enemySpawn) => new SimpleEnemy(enemySpawn, BehaviorModel.Tackler,
-        new StatModel(150f, 200f, 50f, 0f, 0, 10, 200, 50));
+        new StatModel(150f, 500f, 100f, 0f, 0, 10, 200, 50));
 
     public static Enemy CreateSimple(Vector2 enemySpawn) => new SimpleEnemy(enemySpawn, BehaviorModel.Default,
         new StatModel(200f, 300f, 100f, 200f, 5, 5, 100, 30));

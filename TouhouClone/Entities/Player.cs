@@ -6,7 +6,7 @@ namespace TouhouClone.Entities;
 
 public class Player() : Entity(Game.ScreenCenter, 12, 100, 100, 0)
 {
-    public Vector2 Velocity { get; set; } = Vector2.Zero;
+    private Vector2 Velocity { get; set; } = Vector2.Zero;
     private static Player? _instance;
 
     private float Speed => _baseSpeed * _speedMod;
@@ -16,7 +16,7 @@ public class Player() : Entity(Game.ScreenCenter, 12, 100, 100, 0)
     private const float ShootCooldown = 0.2f;
     private float _remainingShootCooldown;
 
-    private const float InvulnerabilityTime = .1f;
+    private const float InvulnerabilityTime = .05f;
     private float _remainingInvulnerability;
 
 
@@ -56,7 +56,7 @@ public class Player() : Entity(Game.ScreenCenter, 12, 100, 100, 0)
     private void Shoot()
     {
         if (_remainingShootCooldown > 0) return;
-        Game.SpawnProjectile(new VerticalProjectile(true, Position, -500, Color.Blue, 10));
+        Game.SpawnProjectile(new VerticalProjectile(true, Position, 5, -500, Color.Blue, 10));
         _remainingShootCooldown = ShootCooldown;
     }
 
@@ -71,14 +71,20 @@ public class Player() : Entity(Game.ScreenCenter, 12, 100, 100, 0)
         if (Raylib.IsKeyDown(KeyboardKey.Right)) vel.X += 1;
         if (Raylib.IsKeyDown(KeyboardKey.Up)) vel.Y -= 1;
         if (Raylib.IsKeyDown(KeyboardKey.Down)) vel.Y += 1;
+        if (Raylib.IsKeyPressed(KeyboardKey.Backspace)) ShootBig();
         if (Raylib.IsKeyDown((KeyboardKey.Space)))
         {
             Shoot();
             _speedMod = 0.6f;
-        }else _speedMod = 1f;
+        }
+        else _speedMod = 1f;
+
 
         if (!(vel.Length() > 0)) return;
         vel = Vector2.Normalize(vel) * Speed * dt;
         Velocity += vel;
     }
+
+    // meant for development only, quicker playtesting
+    private void ShootBig() => Game.SpawnProjectile(new VerticalProjectile(true, Position, 100, -1000, Color.DarkPurple, 1000));
 }

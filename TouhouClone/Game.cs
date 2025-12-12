@@ -11,10 +11,10 @@ internal static class Game
     public static readonly Random Random = new();
     public const int ScreenWidth = 800;
     public const int ScreenHeight = 800;
-    private static List<Projectile> ProjectilesFriendly { get; } = new(50);
-    private static List<Projectile> ProjectilesEnemy { get; } = new(100);
-    private static List<Projectile> ProjectilesFriendlyQueue { get; } = new(50);
-    private static List<Projectile> ProjectilesEnemyQueue { get; } = new(100);
+    private static List<Projectile> ProjectilesFriendly { get; } = new(30);
+    private static List<Projectile> ProjectilesEnemy { get; } = new(1000);
+    private static List<Projectile> ProjectilesFriendlyQueue { get; } = new(30);
+    private static List<Projectile> ProjectilesEnemyQueue { get; } = new(1000);
     private static List<Entity> Enemies { get; } = new(100);
 
     public static readonly Vector2 ScreenCenter = new(ScreenWidth / 2f, ScreenHeight / 2f);
@@ -25,9 +25,8 @@ internal static class Game
         Raylib.InitWindow(ScreenWidth, ScreenHeight, "Touhou Clone - Raylib template");
         Raylib.SetTargetFPS(60);
         Console.WriteLine(Level.Serialize());
-        bool finished = false;
         int gameRes = 0;
-        while (!Raylib.WindowShouldClose() && !finished)
+        while (true)
         {
             var dt = Raylib.GetFrameTime();
 
@@ -35,12 +34,20 @@ internal static class Game
             HandleUpdate(dt);
             HandleDraw();
 
-            if (Level.Completed && Enemies.Count == 0) gameRes = Player.GetInstance().IsAlive ? 1 : -1;
-            if (gameRes != 0 && ProjectilesEnemy.Count == 0) finished = true; // stop when all enemy projectiles are gone
+            var shouldClose = Raylib.WindowShouldClose();
+            var playerDead = !Player.GetInstance().IsAlive;
+            var levelComplete = Level.Completed && Enemies.Count == 0 && ProjectilesEnemy.Count == 0;
+
+            if (!shouldClose && !playerDead && !levelComplete) continue;
+            gameRes = shouldClose ? 0 : (playerDead ? -1 : 1);
+            break;
         }
 
         switch (gameRes)
         {
+            case 0:
+                // do nothing
+                break;
             case 1:
                 Raylib.BeginDrawing();
                 Raylib.ClearBackground(Color.Black);

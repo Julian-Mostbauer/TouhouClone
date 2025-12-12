@@ -3,8 +3,8 @@ using Raylib_cs;
 
 namespace TouhouClone.Projectiles;
 
-public class VerticalProjectile(bool firedByPlayer, Vector2 spawnPoint, float speed, Color color, int damage)
-    : Projectile(firedByPlayer, spawnPoint, 5, speed, color, damage)
+public class VerticalProjectile(bool firedByPlayer, Vector2 spawnPoint, int size, float speed, Color color, int damage)
+    : Projectile(firedByPlayer, spawnPoint, size, speed, color, damage)
 {
     private Vector2 Velocity { get; init; } = new(0, speed);
 
@@ -19,9 +19,9 @@ public class VerticalProjectile(bool firedByPlayer, Vector2 spawnPoint, float sp
         bool facingUp = Velocity.Y < 0;
         int sgn = facingUp ? 1 : -1;
         Raylib.DrawTriangle(
-            new Vector2(Position.X, Position.Y - 10 * sgn), // Top vertex
-            new Vector2(Position.X - 5 * sgn, Position.Y + 5 * sgn), // Bottom-left vertex
-            new Vector2(Position.X + 5 * sgn, Position.Y + 5 * sgn), // Bottom-right vertex
+            new Vector2(Position.X, Position.Y - 2*Size * sgn), // Top vertex
+            new Vector2(Position.X - Size * sgn, Position.Y + Size * sgn), // Bottom-left vertex
+            new Vector2(Position.X + Size * sgn, Position.Y + Size * sgn), // Bottom-right vertex
             Color
         );
     }
