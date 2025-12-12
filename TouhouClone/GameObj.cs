@@ -26,11 +26,9 @@ public abstract class GameObj(Vector2 position, float size)
         return distSq <= radiusSum * radiusSum;
     }
 
-    public bool fullyOnScreen()
-    {
-        return Position.X + Size >= 0 && Position.X - Size <= Game.ScreenWidth &&
-               Position.Y + Size >= 0 && Position.Y - Size <= Game.ScreenHeight;
-    }
+    public bool fullyOnScreen() =>
+        Position.X + Size >= 0 && Position.X - Size <= Game.ScreenWidth &&
+        Position.Y + Size >= 0 && Position.Y - Size <= Game.ScreenHeight;
 
     public void ForcePush(Vector2 force) => _forceVelocity += force;
 

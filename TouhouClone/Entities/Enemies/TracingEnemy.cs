@@ -14,7 +14,7 @@ public class TracingEnemy(Vector2 position, BehaviorModel behavior, StatModel st
 
     private void Shooting()
     {
-        if (!(_random.NextDouble() < Behavior.ShootChance)) return;
+        if (!(Game.NextFloat() < Behavior.ShootChance)) return;
         Game.SpawnProjectile(
             new TracingProjectile(false, Position, Stats.ProjectileSpeed, Color.Red,
                 Stats.ProjectileDamage, Player.GetInstance(), 5f));

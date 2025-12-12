@@ -177,4 +177,9 @@ internal static class Game
 
         return points;
     }
+
+    public static float NextFloat()
+    {
+        return (float)Random.NextDouble();
+    }
 }

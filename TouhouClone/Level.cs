@@ -63,4 +63,4 @@ public class Level
     }
 }
 
-public record Wave(Entities.Enemy[] Enemies);
+public record Wave(Enemy[] Enemies);

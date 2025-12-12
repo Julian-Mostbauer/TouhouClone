@@ -77,7 +77,7 @@ public class SimpleBoss(Vector2 position, BehaviorModel behavior, StatModel stat
         if (_remainingShootTimePhaseA > 0f) return;
 
         foreach (var point in Game.PointsAroundCircle(Position, Size, Math.Min(_shootCountPhaseA, 32)))
-            Game.SpawnProjectile(new TracingProjectile(false, point, Stats.ProjectileSpeed, Color,
+            Game.SpawnProjectile(new TracingProjectile(false, point, Stats.ProjectileSpeed, Color.Red,
                 Stats.ProjectileDamage, Player.GetInstance(), .5f));
 
         _remainingShootTimePhaseA = ShootIntervalA;
@@ -91,17 +91,17 @@ public class SimpleBoss(Vector2 position, BehaviorModel behavior, StatModel stat
 
         foreach (var point in Game.PointsAroundCircle(Position, Size + 10, 32))
             Game.SpawnProjectile(new TargetedProjectile(false, point, Player.GetInstance().Position,
-                Stats.ProjectileSpeed * 4.5f, Color,
+                Stats.ProjectileSpeed * 4.5f, Color.Red,
                 Stats.ProjectileDamage));
         
-        _remainingShootTimePhaseB = (float)(ShootIntervalB * (1 + Game.Random.NextDouble()));
+        _remainingShootTimePhaseB = ShootIntervalB * (1 + Game.NextFloat());
     }
 
     private void Explosion()
     {
         foreach (var point in Game.PointsAroundCircle(Position, Size, 32))
-            Game.SpawnProjectile(new TracingProjectile(false, point, Stats.ProjectileSpeed, Color,
-                Stats.ProjectileDamage, Player.GetInstance(), (float)Game.Random.NextDouble() * 3, 14));
+            Game.SpawnProjectile(new TracingProjectile(false, point, Stats.ProjectileSpeed, Color.Red,
+                Stats.ProjectileDamage, Player.GetInstance(), Game.NextFloat() * 3, 14));
     }
 
     public override void Draw()

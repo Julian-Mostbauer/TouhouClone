@@ -1,10 +1,7 @@
 using System.Numerics;
-
-namespace TouhouClone.Entities;
-
-using System.Numerics;
 using Raylib_cs;
-using TouhouClone.Projectiles;
+
+namespace TouhouClone.Entities.Enemies;
 
 public class Enemy : Entity
 {
@@ -12,11 +9,11 @@ public class Enemy : Entity
     protected static readonly Color[] Colors = [Color.Yellow, Color.Orange, Color.Red];
     protected Color Color => Colors[CalculateColorIndex(Health, MaxHealth)];
     protected Vector2 _goal = new(0, 0);
-    protected readonly Random _random = Game.Random;
     protected readonly BehaviorModel Behavior;
     protected readonly StatModel Stats;
 
-    protected Enemy(Vector2 position, BehaviorModel behavior, StatModel stats) : base(position, stats.Size, stats.MaxHealth, stats.MaxHealth, stats.SlamDamage)
+    protected Enemy(Vector2 position, BehaviorModel behavior, StatModel stats) : base(position, stats.Size,
+        stats.MaxHealth, stats.MaxHealth, stats.SlamDamage)
     {
         _speed = stats.BaseSpeed;
         Behavior = behavior;
@@ -43,14 +40,14 @@ public class Enemy : Entity
         Movement(dt);
         Position = Game.ClampToScreen(Position, Size);
     }
-    
+
     protected virtual void Movement(float dt)
     {
         // Choose a new random goal occasionally
-        if (_goal.Length() == 0 || _random.NextDouble() < Behavior.MovementGoalChange)
+        if (_goal.Length() == 0 || Game.NextFloat() < Behavior.MovementGoalChange)
         {
-            float x = (float)(_random.NextDouble() * Game.ScreenWidth);
-            float y = (float)(_random.NextDouble() * Game.ScreenHeight);
+            float x = Game.NextFloat() * Game.ScreenWidth;
+            float y = Game.NextFloat() * Game.ScreenHeight;
             var point = new Vector2(x, y);
             var toCenter = Vector2.Normalize(Game.ScreenCenter - point);
             var toPlayer = Vector2.Normalize(Player.GetInstance().Position - point);
@@ -59,8 +56,8 @@ public class Enemy : Entity
         }
 
         // adjust speed based on randomness and health (less health = faster)
-        if (_random.NextDouble() < Behavior.SpeedChange)
-            _speed += (float)(_random.NextDouble() - ((float)Health / MaxHealth)) * 20f;
+        if (Game.NextFloat() < Behavior.SpeedChange)
+            _speed += (Game.NextFloat() - (float)Health / MaxHealth) * 20f;
         _speed = Math.Clamp(_speed, Stats.MinSpeed, Stats.MaxSpeed);
 
         // calculate velocity towards goal
