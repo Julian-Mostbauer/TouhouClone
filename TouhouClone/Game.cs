@@ -35,8 +35,7 @@ internal static class Game
             HandleUpdate(dt);
             HandleDraw();
 
-            if (!Player.GetInstance().IsAlive) gameRes = -1;
-            if (Level.Completed && Enemies.Count == 0) gameRes = 1;
+            if (Level.Completed && Enemies.Count == 0) gameRes = Player.GetInstance().IsAlive ? 1 : -1;
             if (gameRes != 0 && ProjectilesEnemy.Count == 0) finished = true; // stop when all enemy projectiles are gone
         }
 
@@ -87,19 +86,7 @@ internal static class Game
 
     private static void HandleInput(float dt)
     {
-        var player = Player.GetInstance();
-        var vel = Vector2.Zero;
-
-        if (Raylib.IsKeyDown(KeyboardKey.Left)) vel.X -= 1;
-        if (Raylib.IsKeyDown(KeyboardKey.Right)) vel.X += 1;
-        if (Raylib.IsKeyDown(KeyboardKey.Up)) vel.Y -= 1;
-        if (Raylib.IsKeyDown(KeyboardKey.Down)) vel.Y += 1;
-        if (Raylib.IsKeyDown((KeyboardKey.Space)))
-            player.Shoot();
-
-        if (!(vel.Length() > 0)) return;
-        vel = Vector2.Normalize(vel) * player.Speed * dt;
-        player.Velocity += vel;
+        Player.GetInstance().HandleInput(dt);
     }
 
     private static void HandleUpdate(float dt)
