@@ -67,10 +67,10 @@ public class Player() : Entity(Game.ScreenCenter, 12, 100, 100, 0)
     {
         var vel = Vector2.Zero;
 
-        if (Raylib.IsKeyDown(KeyboardKey.Left)) vel.X -= 1;
-        if (Raylib.IsKeyDown(KeyboardKey.Right)) vel.X += 1;
-        if (Raylib.IsKeyDown(KeyboardKey.Up)) vel.Y -= 1;
-        if (Raylib.IsKeyDown(KeyboardKey.Down)) vel.Y += 1;
+        if (AnyKeyDown(KeyboardKey.Left, KeyboardKey.A)) vel.X -= 1;
+        if (AnyKeyDown(KeyboardKey.Right, KeyboardKey.D)) vel.X += 1;
+        if (AnyKeyDown(KeyboardKey.Up, KeyboardKey.W)) vel.Y -= 1;
+        if (AnyKeyDown(KeyboardKey.Down, KeyboardKey.S)) vel.Y += 1;
         if (Raylib.IsKeyPressed(KeyboardKey.Backspace)) ShootBig();
         if (Raylib.IsKeyDown((KeyboardKey.Space)))
         {
@@ -83,8 +83,18 @@ public class Player() : Entity(Game.ScreenCenter, 12, 100, 100, 0)
         if (!(vel.Length() > 0)) return;
         vel = Vector2.Normalize(vel) * Speed * dt;
         Velocity += vel;
+        return;
+
+        bool AnyKeyDown(params Span<KeyboardKey> keys)
+        {
+            foreach (var key in keys)
+                if (Raylib.IsKeyDown(key))
+                    return true;
+            return false;
+        }
     }
 
     // meant for development only, quicker playtesting
-    private void ShootBig() => Game.SpawnProjectile(new VerticalProjectile(true, Position, 100, -1000, Color.DarkPurple, 1000));
+    private void ShootBig() =>
+        Game.SpawnProjectile(new VerticalProjectile(true, Position, 200, -1000, Color.DarkPurple, 1000));
 }

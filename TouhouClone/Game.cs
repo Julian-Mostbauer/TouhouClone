@@ -20,9 +20,9 @@ internal static class Game
     public static readonly Vector2 ScreenCenter = new(ScreenWidth / 2f, ScreenHeight / 2f);
     private static readonly Level Level = Level.LoadFromFile("level1.txt");
 
-    public static void Run()
+    public static void Run()    
     {
-        Raylib.InitWindow(ScreenWidth, ScreenHeight, "Touhou Clone - Raylib template");
+        Raylib.InitWindow(ScreenWidth, ScreenHeight, "Touhou Clone");
         Raylib.SetTargetFPS(60);
         Console.WriteLine(Level.Serialize());
         int gameRes = 0;
